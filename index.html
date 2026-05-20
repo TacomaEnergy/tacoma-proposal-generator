@@ -403,8 +403,18 @@ input.err,select.err,textarea.err{border-color:#e03a3a!important}
           <!-- CHARGES — amber section -->
           <tr><td colspan="2" class="section-divider" style="background:var(--amber-bg);border-left:3px solid var(--amber)"><span style="color:#8C5E00">⚠ Additional Charges — NOT included in Total Audit Fee</span></td></tr>
           <tr class="trip-row">
-            <td><div class="service-name">Compliance Revisions</div></td>
-            <td><div class="price-input-wrap"><input type="number" class="price-input addl-price" id="p-compliance-revisions" placeholder="0.00" min="0" step="0.01" oninput="calcTotal()"></div></td>
+            <td>
+              <div class="service-name">Compliance Revisions — Simple</div>
+              <div style="font-size:11px;color:#8C5E00;margin-top:2px">Administrative updates such as address, lot, contact, or minor document corrections</div>
+            </td>
+            <td><div class="price-input-wrap"><input type="number" class="price-input addl-price" id="p-compliance-revisions-simple" placeholder="0.00" min="0" step="0.01" oninput="calcTotal()"></div></td>
+          </tr>
+          <tr class="trip-row">
+            <td>
+              <div class="service-name">Compliance Revisions — Complex</div>
+              <div style="font-size:11px;color:#8C5E00;margin-top:2px">Plan changes such as model, elevation, layout, HVAC/equipment, or revised scope</div>
+            </td>
+            <td><div class="price-input-wrap"><input type="number" class="price-input addl-price" id="p-compliance-revisions-complex" placeholder="0.00" min="0" step="0.01" oninput="calcTotal()"></div></td>
           </tr>
           <tr class="trip-row">
             <td>
@@ -870,7 +880,7 @@ function collectData() {
   normalizeFormFields();
   const priceIds = ['p-compliance','p-prebatt','p-predrywall','p-final','p-airsealing',
     'p-testing-bundled','p-test-blowerdoor','p-test-ductblaster','p-test-mechvent',
-    'p-compliance-revisions','p-manuals','p-manuals-js','p-manuals-option','p-hvac-drawing','p-retest','p-trip','p-hvac-extra'];
+    'p-compliance-revisions-simple','p-compliance-revisions-complex','p-manuals','p-manuals-js','p-manuals-option','p-hvac-drawing','p-retest','p-trip','p-hvac-extra'];
   const prices = {};
   priceIds.forEach(id => { const el=document.getElementById(id); prices[id]=el?el.value:''; });
   const otherRows = [];
@@ -945,6 +955,9 @@ function restoreData(d) {
   setChk('tc-ductblaster',d.tcDuctblaster);
   setChk('tc-mechvent',d.tcMechvent);
   if (d.prices) Object.entries(d.prices).forEach(([id,val]) => set(id,val));
+  if (d.prices && d.prices['p-compliance-revisions'] && !d.prices['p-compliance-revisions-simple'] && !d.prices['p-compliance-revisions-complex']) {
+    set('p-compliance-revisions-simple', d.prices['p-compliance-revisions']);
+  }
   updateTestingPriceUI();
   if (d.prices) {
     ['p-test-blowerdoor','p-test-ductblaster','p-test-mechvent'].forEach(id => {
@@ -1126,7 +1139,7 @@ function hasValue(id) {
   return !!(el && String(el.value || '').trim());
 }
 function hasAnyPricing() {
-  const priceIds = ['p-compliance','p-prebatt','p-predrywall','p-final','p-airsealing','p-testing-bundled','p-test-blowerdoor','p-test-ductblaster','p-test-mechvent','p-compliance-revisions','p-manuals','p-manuals-js','p-manuals-option','p-hvac-drawing','p-retest','p-trip','p-hvac-extra'];
+  const priceIds = ['p-compliance','p-prebatt','p-predrywall','p-final','p-airsealing','p-testing-bundled','p-test-blowerdoor','p-test-ductblaster','p-test-mechvent','p-compliance-revisions-simple','p-compliance-revisions-complex','p-manuals','p-manuals-js','p-manuals-option','p-hvac-drawing','p-retest','p-trip','p-hvac-extra'];
   const basePrices = priceIds.some(id => {
     const el = document.getElementById(id);
     return el && parseFloat(el.value || 0) > 0;
@@ -1288,9 +1301,13 @@ function generateProposal() {
   if (hvacDrawingVal > 0) {
     addlRows += `<div class="prop-addl-row"><span>HVAC Drawing</span><span class="prop-addl-price">${fmtP(hvacDrawingVal)}</span></div>`;
   }
-  const complianceRevisionsVal = val('p-compliance-revisions');
-  if (complianceRevisionsVal > 0) {
-    addlRows += `<div class="prop-addl-row"><span>Compliance Revisions</span><span class="prop-addl-price">${fmtP(complianceRevisionsVal)}</span></div>`;
+  const complianceRevisionsSimpleVal = val('p-compliance-revisions-simple');
+  if (complianceRevisionsSimpleVal > 0) {
+    addlRows += `<div class="prop-addl-row"><span>Compliance Revisions — Simple</span><span class="prop-addl-price">${fmtP(complianceRevisionsSimpleVal)}</span></div>`;
+  }
+  const complianceRevisionsComplexVal = val('p-compliance-revisions-complex');
+  if (complianceRevisionsComplexVal > 0) {
+    addlRows += `<div class="prop-addl-row"><span>Compliance Revisions — Complex</span><span class="prop-addl-price">${fmtP(complianceRevisionsComplexVal)}</span></div>`;
   }
   d.otherRows.forEach(r => {
     if (r.desc && parseFloat(r.price||0)>0)
