@@ -53,6 +53,9 @@ input.err,select.err,textarea.err{border-color:#e03a3a!important}
 .test-check input[type=checkbox]{width:16px;height:16px;accent-color:var(--blue);cursor:pointer}
 .trip-row td{background:var(--amber-bg)!important;border-left:3px solid var(--amber)}
 .trip-row .service-name{color:#8C5E00}
+.compliance-revision-row.revision-disabled td{background:#F7F7F7!important;border-left-color:#D1D5DB!important;opacity:.72}
+.compliance-revision-row.revision-disabled .service-name,.compliance-revision-row.revision-disabled div{color:#6B7280!important}
+.compliance-revision-row.revision-disabled input{background:#F3F4F6!important;color:#9CA3AF!important;cursor:not-allowed}
 .retest-lang{width:100%;padding:7px 10px;border:1.5px solid var(--border);border-radius:6px;font-size:12px;font-family:inherit;color:var(--black);margin-top:6px;resize:none;min-height:52px}
 .retest-lang:focus{outline:none;border-color:var(--blue)}
 .other-row{display:flex;gap:10px;margin-bottom:10px;align-items:flex-end}
@@ -310,7 +313,7 @@ input.err,select.err,textarea.err{border-color:#e03a3a!important}
 
           <tr>
             <td><div class="service-name">Compliance Review</div></td>
-            <td><div class="price-input-wrap"><input type="number" class="price-input core-price" id="p-compliance" placeholder="0.00" min="0" step="0.01" oninput="calcTotal()"></div></td>
+            <td><div class="price-input-wrap"><input type="number" class="price-input core-price" id="p-compliance" placeholder="0.00" min="0" step="0.01" oninput="syncComplianceRevisions();calcTotal()"></div></td>
           </tr>
           <tr>
             <td><div class="service-name">Pre-Batt Inspection</div></td>
@@ -402,17 +405,17 @@ input.err,select.err,textarea.err{border-color:#e03a3a!important}
 
           <!-- CHARGES — amber section -->
           <tr><td colspan="2" class="section-divider" style="background:var(--amber-bg);border-left:3px solid var(--amber)"><span style="color:#8C5E00">⚠ Additional Charges — NOT included in Total Audit Fee</span></td></tr>
-          <tr class="trip-row">
+          <tr class="trip-row compliance-revision-row" id="row-compliance-revisions-simple">
             <td>
               <div class="service-name">Compliance Revisions — Simple</div>
-              <div style="font-size:11px;color:#8C5E00;margin-top:2px">Administrative updates such as address, lot, contact, or minor document corrections</div>
+              <div style="font-size:11px;color:#8C5E00;margin-top:2px">Administrative updates such as address, lot, or minor corrections</div>
             </td>
             <td><div class="price-input-wrap"><input type="number" class="price-input addl-price" id="p-compliance-revisions-simple" placeholder="0.00" min="0" step="0.01" oninput="calcTotal()"></div></td>
           </tr>
-          <tr class="trip-row">
+          <tr class="trip-row compliance-revision-row" id="row-compliance-revisions-complex">
             <td>
               <div class="service-name">Compliance Revisions — Complex</div>
-              <div style="font-size:11px;color:#8C5E00;margin-top:2px">Plan changes such as model, elevation, layout, HVAC/equipment, or revised scope</div>
+              <div style="font-size:11px;color:#8C5E00;margin-top:2px">Plan changes such as model, elevation, layout, or HVAC/equipment changes</div>
             </td>
             <td><div class="price-input-wrap"><input type="number" class="price-input addl-price" id="p-compliance-revisions-complex" placeholder="0.00" min="0" step="0.01" oninput="calcTotal()"></div></td>
           </tr>
@@ -615,6 +618,7 @@ window.addEventListener('DOMContentLoaded', () => {
     d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
   if (!document.getElementById('p-retest').value) document.getElementById('p-retest').value = '250.00';
   if (!document.getElementById('p-trip').value) document.getElementById('p-trip').value = '125.00';
+  syncComplianceRevisions();
   setupMoneyFormatting();
   formatAllMoneyInputs();
   const loadInput = document.getElementById('load-file-input');
@@ -835,6 +839,34 @@ function formatMoneyField(el) {
   if (!el || String(el.value || '').trim() === '') return;
   el.value = formatMoneyValue(el.value);
 }
+function syncComplianceRevisions() {
+  const compliance = document.getElementById('p-compliance');
+  const simple = document.getElementById('p-compliance-revisions-simple');
+  const complex = document.getElementById('p-compliance-revisions-complex');
+  const simpleRow = document.getElementById('row-compliance-revisions-simple');
+  const complexRow = document.getElementById('row-compliance-revisions-complex');
+  if (!compliance || !simple || !complex) return;
+
+  const complianceVal = parseFloat(compliance.value || 0) || 0;
+  const enabled = complianceVal > 0;
+
+  [simple, complex].forEach(input => {
+    input.disabled = !enabled;
+    input.title = enabled ? '' : 'Compliance revisions are only available when Compliance Review is included.';
+  });
+  [simpleRow, complexRow].forEach(row => {
+    if (row) row.classList.toggle('revision-disabled', !enabled);
+  });
+
+  if (!enabled) {
+    simple.value = '0.00';
+    complex.value = '0.00';
+    return;
+  }
+
+  simple.value = '25.00';
+  complex.value = complianceVal.toFixed(2);
+}
 function formatAllMoneyInputs() {
   document.querySelectorAll('.price-input').forEach(formatMoneyField);
 }
@@ -878,6 +910,7 @@ function normalizeFormFields() {
 // ── COLLECT DATA ──
 function collectData() {
   normalizeFormFields();
+  syncComplianceRevisions();
   const priceIds = ['p-compliance','p-prebatt','p-predrywall','p-final','p-airsealing',
     'p-testing-bundled','p-test-blowerdoor','p-test-ductblaster','p-test-mechvent',
     'p-compliance-revisions-simple','p-compliance-revisions-complex','p-manuals','p-manuals-js','p-manuals-option','p-hvac-drawing','p-retest','p-trip','p-hvac-extra'];
@@ -985,6 +1018,7 @@ function restoreData(d) {
   } else {
     unconfirmProposal();
   }
+  syncComplianceRevisions();
   formatAllMoneyInputs();
   updateFilename(); calcTotal();
 }
@@ -1142,7 +1176,7 @@ function hasAnyPricing() {
   const priceIds = ['p-compliance','p-prebatt','p-predrywall','p-final','p-airsealing','p-testing-bundled','p-test-blowerdoor','p-test-ductblaster','p-test-mechvent','p-compliance-revisions-simple','p-compliance-revisions-complex','p-manuals','p-manuals-js','p-manuals-option','p-hvac-drawing','p-retest','p-trip','p-hvac-extra'];
   const basePrices = priceIds.some(id => {
     const el = document.getElementById(id);
-    return el && parseFloat(el.value || 0) > 0;
+    return el && !el.disabled && parseFloat(el.value || 0) > 0;
   });
   const customPrices = Array.from(document.querySelectorAll('.other-row input[type=number]')).some(el => parseFloat(el.value || 0) > 0);
   return basePrices || customPrices;
