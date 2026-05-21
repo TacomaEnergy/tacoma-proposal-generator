@@ -316,104 +316,109 @@ input.err,select.err,textarea.err{border-color:#e03a3a!important}
             </td>
           </tr>
 
-          <!-- ADDITIONAL SERVICES — collapsible -->
+          <!-- ADDITIONAL SERVICES — always visible -->
+          <tr><td colspan="2" class="section-divider"><span>Additional Services — NOT included in Total Audit Fee</span></td></tr>
+          <tr>
+            <td><div class="service-name">Manuals (Manual J, D &amp; S)</div></td>
+            <td><div class="price-input-wrap"><input type="number" class="price-input addl-price" id="p-manuals" placeholder="0.00" min="0" step="0.01" oninput="calcTotal()"></div></td>
+          </tr>
+          <tr class="sub-item">
+            <td><div class="service-name">↳ Manuals — Per Option</div></td>
+            <td><div class="price-input-wrap"><input type="number" class="price-input addl-price" id="p-manuals-option" placeholder="0.00" min="0" step="0.01" oninput="calcTotal()"></div></td>
+          </tr>
+          <tr>
+            <td colspan="2" style="padding:4px 12px 12px">
+              <input type="text" id="manuals-notes" placeholder="Manuals notes (optional — e.g. per model/base house details, scope clarification...)" style="font-size:12px;width:100%;border:1.5px solid var(--border);border-radius:6px;padding:7px 10px;font-family:inherit">
+            </td>
+          </tr>
+
+          <!-- SPECIALTY — collapsible toggle (rarely used) -->
           <tr>
             <td colspan="2" style="padding:0">
               <button type="button" onclick="toggleAddl()" id="addl-toggle-btn"
-                style="width:100%;background:var(--gray);border:none;border-bottom:1px solid var(--border);padding:11px 16px;text-align:left;cursor:pointer;display:flex;align-items:center;justify-content:space-between;font-family:inherit">
-                <span style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:var(--navy)">
-                  Additional Services &amp; Charges <span style="font-weight:400;color:var(--muted)">(leave blank to exclude)</span>
+                style="width:100%;background:var(--gray);border:none;border-top:1px solid var(--border);border-bottom:1px solid var(--border);padding:10px 16px;text-align:left;cursor:pointer;display:flex;align-items:center;justify-content:space-between;font-family:inherit">
+                <span style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:var(--muted)">
+                  ＋ Specialty Services <span style="font-weight:400">(Duct Sealing · No Burn · Certification Fee)</span>
                 </span>
-                <span id="addl-toggle-icon" style="font-size:13px;color:var(--muted);transition:transform 0.2s">▼</span>
+                <span id="addl-toggle-icon" style="font-size:12px;color:var(--muted);transition:transform 0.2s">▼</span>
               </button>
             </td>
           </tr>
           <tr id="addl-panel" style="display:none">
-            <td colspan="2" style="padding:0">
+            <td colspan="2" style="padding:0;background:var(--light-blue)">
               <table style="width:100%;border-collapse:collapse">
                 <tbody>
-
-                  <tr><td colspan="2" style="background:#F0F4F8;padding:7px 16px;border-bottom:1px solid var(--border)"><span style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.07em;color:var(--navy)">Services</span></td></tr>
-                  <tr class="addl-row">
-                    <td class="addl-label">Manuals (Manual J, D &amp; S)</td>
-                    <td class="addl-price-cell"><div class="price-input-wrap" style="max-width:130px;margin:0 auto"><input type="number" class="price-input addl-price" id="p-manuals" placeholder="0.00" min="0" step="0.01" oninput="calcTotal()"></div></td>
+                  <tr>
+                    <td style="padding:9px 16px;border-bottom:1px solid var(--border);font-size:13px;font-weight:600;color:var(--black);width:70%">Duct Sealing</td>
+                    <td style="padding:9px 16px;border-bottom:1px solid var(--border);text-align:center"><div class="price-input-wrap" style="max-width:130px;margin:0 auto"><input type="number" class="price-input addl-price" id="p-duct-sealing" placeholder="0.00" min="0" step="0.01" oninput="calcTotal()"></div></td>
                   </tr>
-                  <tr class="addl-row addl-sub">
-                    <td class="addl-label">↳ Manuals — Per Option</td>
-                    <td class="addl-price-cell"><div class="price-input-wrap" style="max-width:130px;margin:0 auto"><input type="number" class="price-input addl-price" id="p-manuals-option" placeholder="0.00" min="0" step="0.01" oninput="calcTotal()"></div></td>
+                  <tr>
+                    <td style="padding:9px 16px;border-bottom:1px solid var(--border);font-size:13px;font-weight:600;color:var(--black)">No Burn</td>
+                    <td style="padding:9px 16px;border-bottom:1px solid var(--border);text-align:center"><div class="price-input-wrap" style="max-width:130px;margin:0 auto"><input type="number" class="price-input addl-price" id="p-no-burn" placeholder="0.00" min="0" step="0.01" oninput="calcTotal()"></div></td>
                   </tr>
-                  <tr class="addl-row">
-                    <td colspan="2" style="padding:4px 16px 10px">
-                      <input type="text" id="manuals-notes" placeholder="Manuals notes (optional — e.g. per model/base house details...)" style="font-size:12px;width:100%;border:1.5px solid var(--border);border-radius:6px;padding:7px 10px;font-family:inherit">
-                    </td>
+                  <tr>
+                    <td style="padding:9px 16px;font-size:13px;font-weight:600;color:var(--black)">Certification Fee</td>
+                    <td style="padding:9px 16px;text-align:center"><div class="price-input-wrap" style="max-width:130px;margin:0 auto"><input type="number" class="price-input addl-price" id="p-cert-fee" placeholder="0.00" min="0" step="0.01" oninput="calcTotal()"></div></td>
                   </tr>
-                  <tr class="addl-row">
-                    <td class="addl-label">Duct Sealing</td>
-                    <td class="addl-price-cell"><div class="price-input-wrap" style="max-width:130px;margin:0 auto"><input type="number" class="price-input addl-price" id="p-duct-sealing" placeholder="0.00" min="0" step="0.01" oninput="calcTotal()"></div></td>
-                  </tr>
-                  <tr class="addl-row">
-                    <td class="addl-label">No Burn</td>
-                    <td class="addl-price-cell"><div class="price-input-wrap" style="max-width:130px;margin:0 auto"><input type="number" class="price-input addl-price" id="p-no-burn" placeholder="0.00" min="0" step="0.01" oninput="calcTotal()"></div></td>
-                  </tr>
-                  <tr class="addl-row">
-                    <td class="addl-label">Certification Fee</td>
-                    <td class="addl-price-cell"><div class="price-input-wrap" style="max-width:130px;margin:0 auto"><input type="number" class="price-input addl-price" id="p-cert-fee" placeholder="0.00" min="0" step="0.01" oninput="calcTotal()"></div></td>
-                  </tr>
-                  <tr class="addl-row">
-                    <td class="addl-label">Compliance Revisions</td>
-                    <td class="addl-price-cell"><div class="price-input-wrap" style="max-width:130px;margin:0 auto"><input type="number" class="price-input addl-price" id="p-compliance-revisions" placeholder="0.00" min="0" step="0.01" oninput="calcTotal()"></div></td>
-                  </tr>
-
-                  <tr><td colspan="2" style="background:#FFF8EC;padding:7px 16px;border-bottom:1px solid #F39C12;border-top:1px solid var(--border)"><span style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.07em;color:#8C5E00">⚠ Charges</span></td></tr>
-                  <tr class="addl-row" style="background:#FFFDF8">
-                    <td class="addl-label" style="color:#8C5E00">
-                      Repair / Re-test — Hourly Rate
-                      <label class="test-check" style="font-size:11px;font-weight:500;color:#8C5E00;margin-top:5px;display:flex;align-items:center;gap:6px">
-                        <input type="checkbox" id="retest-waived" style="accent-color:#F39C12"> Waived
-                      </label>
-                    </td>
-                    <td class="addl-price-cell">
-                      <div class="price-input-wrap" style="max-width:130px;margin:0 auto"><input type="number" class="price-input addl-price" id="p-retest" placeholder="250.00" value="250" min="0" step="0.01" oninput="calcTotal()"></div>
-                      <div style="font-size:10px;color:#8C5E00;text-align:center;margin-top:3px">per hour</div>
-                    </td>
-                  </tr>
-                  <tr class="addl-row" style="background:#FFFDF8">
-                    <td class="addl-label" style="color:#8C5E00">
-                      Trip Charges / Re-inspection Fee
-                      <label class="test-check" style="font-size:11px;font-weight:500;color:#8C5E00;margin-top:5px;display:flex;align-items:center;gap:6px">
-                        <input type="checkbox" id="trip-first-free" style="accent-color:#F39C12"> First trip free per home
-                      </label>
-                    </td>
-                    <td class="addl-price-cell"><div class="price-input-wrap" style="max-width:130px;margin:0 auto"><input type="number" class="price-input addl-price" id="p-trip" placeholder="0.00" min="0" step="0.01" oninput="calcTotal()"></div></td>
-                  </tr>
-                  <tr class="addl-row" style="background:#FFFDF8">
-                    <td class="addl-label" style="color:#8C5E00">
-                      Additional HVAC System Fee
-                      <div style="font-size:11px;color:#8C5E00;margin-top:2px">Per system over 1</div>
-                    </td>
-                    <td class="addl-price-cell"><div class="price-input-wrap" style="max-width:130px;margin:0 auto"><input type="number" class="price-input addl-price" id="p-hvac-extra" placeholder="200.00" min="0" step="0.01" oninput="calcTotal()"></div></td>
-                  </tr>
-
                 </tbody>
               </table>
+            </td>
+          </tr>
 
-              <!-- Other custom services -->
-              <div style="padding:14px 16px;border-top:1px solid var(--border)">
-                <label style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.07em;color:var(--navy);display:block;margin-bottom:10px">Other / Custom Services</label>
-                <div id="other-services-list">
-                  <div class="other-row">
-                    <div class="col-3"><input type="text" placeholder="Service description..."></div>
-                    <div style="min-width:140px"><div class="price-input-wrap" style="max-width:130px;margin:0"><input type="number" class="price-input addl-price" placeholder="0.00" min="0" step="0.01" oninput="calcTotal()"></div></div>
-                    <button type="button" class="btn-remove" onclick="removeOther(this)">✕</button>
-                  </div>
-                </div>
-                <button type="button" class="btn-add" onclick="addOther()">+ Add Another Service</button>
+          <!-- CHARGES — always visible amber section -->
+          <tr><td colspan="2" class="section-divider" style="background:var(--amber-bg);border-left:3px solid var(--amber)"><span style="color:#8C5E00">⚠ Additional Charges — NOT included in Total Audit Fee</span></td></tr>
+          <tr class="trip-row">
+            <td><div class="service-name">Compliance Revisions</div></td>
+            <td><div class="price-input-wrap"><input type="number" class="price-input addl-price" id="p-compliance-revisions" placeholder="0.00" min="0" step="0.01" oninput="calcTotal()"></div></td>
+          </tr>
+          <tr class="trip-row">
+            <td>
+              <div class="service-name">Repair / Re-test — Hourly Rate</div>
+              <div style="margin-top:6px">
+                <label class="test-check" style="font-size:12px;font-weight:500;color:#8C5E00">
+                  <input type="checkbox" id="retest-waived" style="accent-color:#F39C12"> Waived
+                </label>
               </div>
             </td>
+            <td>
+              <div class="price-input-wrap"><input type="number" class="price-input addl-price" id="p-retest" placeholder="250.00" value="250" min="0" step="0.01" oninput="calcTotal()"></div>
+              <div style="font-size:10px;color:#8C5E00;text-align:center;margin-top:3px">per hour</div>
+            </td>
+          </tr>
+          <tr class="trip-row">
+            <td>
+              <div class="service-name">Trip Charges / Re-inspection Fee</div>
+              <div style="margin-top:6px">
+                <label class="test-check" style="font-size:12px;font-weight:500;color:#8C5E00">
+                  <input type="checkbox" id="trip-first-free" style="accent-color:#F39C12"> First trip charge is free per home
+                </label>
+              </div>
+            </td>
+            <td><div class="price-input-wrap"><input type="number" class="price-input addl-price" id="p-trip" placeholder="0.00" min="0" step="0.01" oninput="calcTotal()"></div></td>
+          </tr>
+          <tr class="trip-row">
+            <td>
+              <div class="service-name">Additional HVAC System Fee</div>
+              <div style="font-size:11px;color:#8C5E00;margin-top:2px">Per HVAC system over 1</div>
+            </td>
+            <td><div class="price-input-wrap"><input type="number" class="price-input addl-price" id="p-hvac-extra" placeholder="200.00" min="0" step="0.01" oninput="calcTotal()"></div></td>
           </tr>
 
         </tbody>
       </table>
+
+      <!-- Other custom services -->
+      <div style="padding:16px 20px;border-top:1px solid var(--border)">
+        <label style="margin-bottom:10px">Other / Custom Services <span style="font-weight:400;color:var(--muted);text-transform:none;letter-spacing:0">(optional · NOT included in total)</span></label>
+        <div id="other-services-list">
+          <div class="other-row">
+            <div class="col-3"><input type="text" placeholder="Service description..."></div>
+            <div style="min-width:140px"><div class="price-input-wrap" style="max-width:130px;margin:0"><input type="number" class="price-input addl-price" placeholder="0.00" min="0" step="0.01" oninput="calcTotal()"></div></div>
+            <button type="button" class="btn-remove" onclick="removeOther(this)">✕</button>
+          </div>
+        </div>
+        <button type="button" class="btn-add" onclick="addOther()">+ Add Another Service</button>
+      </div>
     </div>
   </div>
 
@@ -601,9 +606,9 @@ function updateTestingPriceUI() {
 function toggleAddl() {
   const panel = document.getElementById('addl-panel');
   const icon  = document.getElementById('addl-toggle-icon');
-  const open  = panel.style.display === 'none' || panel.style.display === '';
-  panel.style.display = open ? 'table-row' : 'none';
-  icon.style.transform = open ? 'rotate(180deg)' : '';
+  const isHidden = panel.style.display === 'none' || panel.style.display === '';
+  panel.style.display = isHidden ? '' : 'none';
+  icon.style.transform = isHidden ? 'rotate(180deg)' : '';
 }
 
 
@@ -735,7 +740,7 @@ function restoreData(d) {
   if (hasAddl) {
     const panel = document.getElementById('addl-panel');
     const icon  = document.getElementById('addl-toggle-icon');
-    if (panel) { panel.style.display='table-row'; icon.style.transform='rotate(180deg)'; }
+    if (panel) { panel.style.display=''; icon.style.transform='rotate(180deg)'; }
   }
   setChk('tc-blowerdoor',d.tcBlowerdoor);
   setChk('tc-ductblaster',d.tcDuctblaster);
