@@ -954,7 +954,8 @@ function collectData() {
   syncComplianceRevisions();
   const priceIds = ['p-compliance','p-prebatt','p-predrywall','p-final','p-airsealing',
     'p-testing-bundled','p-test-blowerdoor','p-test-ductblaster','p-test-mechvent',
-    'p-compliance-revisions-simple','p-compliance-revisions-complex','p-manuals','p-manuals-js','p-manuals-option','p-hvac-drawing','p-retest','p-trip','p-hvac-extra'];
+    'p-compliance-revisions-simple','p-compliance-revisions-complex','p-manuals','p-manuals-js','p-manuals-option','p-hvac-drawing','p-retest','p-trip','p-hvac-extra',
+    'p-duct-sealing','p-no-burn','p-cert-fee','p-street-cleaning'];
   const prices = {};
   priceIds.forEach(id => { const el=document.getElementById(id); prices[id]=el?el.value:''; });
   const otherRows = [];
@@ -1385,11 +1386,11 @@ function generateProposal() {
   }
   const complianceRevisionsSimpleVal = val('p-compliance-revisions-simple');
   if (complianceRevisionsSimpleVal > 0) {
-    addlRows += `<div class="prop-addl-row"><span>Compliance Revisions — Simple</span><span class="prop-addl-price">${fmtP(complianceRevisionsSimpleVal)}</span></div>`;
+    addlRows += `<div class="prop-addl-row"><span>Compliance Revisions — Simple <span style="font-size:8pt;color:#888;font-style:italic">Administrative updates such as address, lot, or minor corrections</span></span><span class="prop-addl-price">${fmtP(complianceRevisionsSimpleVal)}</span></div>`;
   }
   const complianceRevisionsComplexVal = val('p-compliance-revisions-complex');
   if (complianceRevisionsComplexVal > 0) {
-    addlRows += `<div class="prop-addl-row"><span>Compliance Revisions — Complex</span><span class="prop-addl-price">${fmtP(complianceRevisionsComplexVal)}</span></div>`;
+    addlRows += `<div class="prop-addl-row"><span>Compliance Revisions — Complex <span style="font-size:8pt;color:#888;font-style:italic">Plan changes such as model, elevation, layout, or HVAC/equipment changes</span></span><span class="prop-addl-price">${fmtP(complianceRevisionsComplexVal)}</span></div>`;
   }
   if (val('p-duct-sealing') > 0)
     addlRows += `<div class="prop-addl-row"><span>Duct Sealing</span><span class="prop-addl-price">${fmtP(val('p-duct-sealing'))}</span></div>`;
