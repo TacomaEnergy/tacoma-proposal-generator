@@ -1403,7 +1403,8 @@ function generateProposal() {
   const retestVal = val('p-retest');
   const retestWaived = d.retestWaived;
   const tripVal = val('p-trip');
-  const hvacVal = val('p-hvac-extra');
+  const hvacEl = document.getElementById('p-hvac-extra');
+  const hvacVal = parseFloat(d.prices['p-hvac-extra'] || hvacEl?.value || 0) || 0;
   const tripFirstFree = d.tripFirstFree;
   const tripWaived = d.tripWaived;
   const hvacWaived = d.hvacWaived;
