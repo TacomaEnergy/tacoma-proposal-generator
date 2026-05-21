@@ -459,7 +459,7 @@ input.err,select.err,textarea.err{border-color:#e03a3a!important}
                 </label>
               </div>
             </td>
-            <td><div class="price-input-wrap"><input type="number" class="price-input addl-price" id="p-hvac-extra" placeholder="200.00" min="0" step="0.01" oninput="calcTotal()"></div></td>
+            <td><div class="price-input-wrap"><input type="number" class="price-input addl-price" id="p-hvac-extra" placeholder="200.00" value="200" min="0" step="0.01" oninput="calcTotal()"></div></td>
           </tr>
 
         </tbody>
@@ -609,10 +609,13 @@ body.printing{font-family:'Helvetica Neue',Arial,sans-serif}
 .prop-addl-row{display:flex;justify-content:space-between;align-items:baseline;padding:2pt 0;border-bottom:0.5pt solid #eee;font-size:8.75pt}
 .prop-addl-row:last-child{border-bottom:none}
 .prop-addl-price{font-weight:600;color:#333;padding-left:9pt;white-space:nowrap}
-.prop-trip-box{background:#FFF8EC;border:0.75pt solid #F39C12;border-radius:3pt;padding:5pt 8pt;margin-top:5pt;font-size:8.75pt;display:flex;justify-content:space-between;align-items:center}
-.prop-trip-label{font-weight:600;color:#8C5E00}
-.prop-trip-sub{font-size:7.75pt;color:#8C5E00;font-style:italic;margin-top:1pt}
-.prop-trip-price{font-weight:700;color:#8C5E00;font-size:9.25pt}
+.prop-charge-row{display:flex;justify-content:space-between;align-items:baseline;padding:4pt 8pt;border-bottom:0.5pt solid #F5CBA7;font-size:8.75pt;background:#FFF8EC}
+.prop-charge-row:first-child{border-top-left-radius:3pt;border-top-right-radius:3pt}
+.prop-charge-row:last-child{border-bottom:none;border-bottom-left-radius:3pt;border-bottom-right-radius:3pt}
+.prop-charge-label{font-weight:600;color:#8C5E00}
+.prop-charge-sub{font-size:7.75pt;color:#8C5E00;font-style:italic;font-weight:400;margin-left:6pt}
+.prop-charge-price{font-weight:700;color:#8C5E00;font-size:9pt;padding-left:9pt;white-space:nowrap}
+.prop-charges-box{border:0.75pt solid #F39C12;border-radius:3pt;margin-top:5pt;overflow:hidden}
 .prop-retest{display:flex;justify-content:space-between;align-items:baseline;padding:3pt 0;border-bottom:0.5pt solid #eee;font-size:8.75pt;color:#333}
 
 /* Legal */
@@ -1384,14 +1387,6 @@ function generateProposal() {
   if (hvacDrawingVal > 0) {
     addlRows += `<div class="prop-addl-row"><span>HVAC Drawing</span><span class="prop-addl-price">${fmtP(hvacDrawingVal)}</span></div>`;
   }
-  const complianceRevisionsSimpleVal = val('p-compliance-revisions-simple');
-  if (complianceRevisionsSimpleVal > 0) {
-    addlRows += `<div class="prop-addl-row"><span>Compliance Revisions — Simple <span style="font-size:8pt;color:#888;font-style:italic">Administrative updates such as address, lot, or minor corrections</span></span><span class="prop-addl-price">${fmtP(complianceRevisionsSimpleVal)}</span></div>`;
-  }
-  const complianceRevisionsComplexVal = val('p-compliance-revisions-complex');
-  if (complianceRevisionsComplexVal > 0) {
-    addlRows += `<div class="prop-addl-row"><span>Compliance Revisions — Complex <span style="font-size:8pt;color:#888;font-style:italic">Plan changes such as model, elevation, layout, or HVAC/equipment changes</span></span><span class="prop-addl-price">${fmtP(complianceRevisionsComplexVal)}</span></div>`;
-  }
   if (val('p-duct-sealing') > 0)
     addlRows += `<div class="prop-addl-row"><span>Duct Sealing</span><span class="prop-addl-price">${fmtP(val('p-duct-sealing'))}</span></div>`;
   if (val('p-no-burn') > 0)
@@ -1407,25 +1402,29 @@ function generateProposal() {
 
   const retestVal = val('p-retest');
   const retestWaived = d.retestWaived;
-  const retestLine = !retestWaived && retestVal > 0
-    ? `<div class="prop-retest"><span>Repair / Retest Labor</span><span class="prop-addl-price">${fmtP(retestVal)}/hr</span></div>` : '';
-
   const tripVal = val('p-trip');
   const hvacVal = val('p-hvac-extra');
   const tripFirstFree = d.tripFirstFree;
   const tripWaived = d.tripWaived;
   const hvacWaived = d.hvacWaived;
 
-  const tripBox = ((!tripWaived && tripVal > 0) || (!hvacWaived && hvacVal > 0)) ? `
-    <div class="prop-trip-box">
-      <div style="width:100%">
-        ${(!tripWaived && tripVal > 0) ? `<div class="prop-trip-label">Trip Charge / Re-inspection Fee — ${fmtP(tripVal)}${tripFirstFree ? ' <span style="font-size:8pt;font-weight:400;font-style:italic">(first trip charge is free)</span>' : ''}</div>
-        <div class="prop-trip-sub">Charged if we arrive at a job site and it is not ready</div>` : ''}
-        ${(!hvacWaived && hvacVal > 0) ? `<div class="prop-trip-label" style="margin-top:${(!tripWaived && tripVal>0)?'8pt':'0'}">Additional HVAC System Fee — ${fmtP(hvacVal)} per system over 1</div>` : ''}
-      </div>
-    </div>` : '';
+  // Build unified amber charges block
+  let chargeRows = '';
+  const complianceRevisionsSimpleVal = val('p-compliance-revisions-simple');
+  if (complianceRevisionsSimpleVal > 0)
+    chargeRows += `<div class="prop-charge-row"><span class="prop-charge-label">Compliance Revisions — Simple<span class="prop-charge-sub">Administrative updates such as address, lot, or minor corrections</span></span><span class="prop-charge-price">${fmtP(complianceRevisionsSimpleVal)}</span></div>`;
+  const complianceRevisionsComplexVal = val('p-compliance-revisions-complex');
+  if (complianceRevisionsComplexVal > 0)
+    chargeRows += `<div class="prop-charge-row"><span class="prop-charge-label">Compliance Revisions — Complex<span class="prop-charge-sub">Plan changes such as model, elevation, layout, or HVAC/equipment changes</span></span><span class="prop-charge-price">${fmtP(complianceRevisionsComplexVal)}</span></div>`;
+  if (!retestWaived && retestVal > 0)
+    chargeRows += `<div class="prop-charge-row"><span class="prop-charge-label">Repair / Retest Labor<span class="prop-charge-sub">per hour</span></span><span class="prop-charge-price">${fmtP(retestVal)}/hr</span></div>`;
+  if (!tripWaived && tripVal > 0)
+    chargeRows += `<div class="prop-charge-row"><span class="prop-charge-label">Trip Charge / Re-inspection Fee${tripFirstFree ? '<span class="prop-charge-sub">first trip charge is free</span>' : ''}</span><span class="prop-charge-price">${fmtP(tripVal)}</span></div>`;
+  if (!hvacWaived && hvacVal > 0)
+    chargeRows += `<div class="prop-charge-row"><span class="prop-charge-label">Additional HVAC System Fee<span class="prop-charge-sub">per system over 1</span></span><span class="prop-charge-price">${fmtP(hvacVal)}</span></div>`;
+  const tripBox = chargeRows ? `<div class="prop-charges-box">${chargeRows}</div>` : '';
 
-  const hasAddl = addlRows || retestLine || tripBox;
+  const hasAddl = addlRows || tripBox;
 
   const scopeSection = d.scopeNotes
     ? `<div class="prop-scope">${d.scopeNotes}</div>` : '';
@@ -1499,7 +1498,6 @@ function generateProposal() {
     <div class="prop-addl-header">Additional Services &amp; Charges</div>
     <p class="prop-addl-note">The following fees apply only if additional services are required or if circumstances change during the project.</p>
     ${addlRows ? `<div>${addlRows}</div>` : ''}
-    ${retestLine}
     ${tripBox}
     ` : ''}
 
