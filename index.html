@@ -78,6 +78,14 @@ input.err,select.err,textarea.err{border-color:#e03a3a!important}
 .toolbar-hint{font-size:12px;color:var(--muted)}
 .gen-bar{margin-top:28px;display:flex;justify-content:flex-end;gap:12px;align-items:center;flex-wrap:wrap}
 .btn-generate{background:var(--green-dark);color:#fff;border:none;border-radius:8px;padding:14px 36px;font-size:15px;font-weight:700;cursor:pointer;font-family:inherit;display:flex;align-items:center;gap:8px}
+.btn-preview{background:var(--white);color:var(--navy);border:1.5px solid var(--navy);border-radius:8px;padding:13px 22px;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;display:flex;align-items:center;gap:8px}
+.btn-preview:hover{background:var(--light-blue)}
+.autosave-banner{display:none;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap;background:#FFF8EC;border:1px solid var(--amber);border-left:4px solid var(--amber);border-radius:8px;padding:12px 16px;margin-bottom:16px;font-size:13px;color:#5C4400}
+.autosave-banner-actions{display:flex;gap:8px}
+.btn-autosave-restore{background:var(--green-dark);color:#fff;border:none;border-radius:6px;padding:8px 18px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit}
+.btn-autosave-restore:hover{background:#145c30}
+.btn-autosave-discard{background:var(--white);color:var(--muted);border:1px solid var(--border);border-radius:6px;padding:8px 14px;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit}
+.btn-autosave-discard:hover{color:#C0392B;border-color:#F3B3B3}
 .btn-generate:hover{background:#145c30}
 .btn-clear{background:none;border:1.5px solid var(--border);border-radius:8px;padding:12px 20px;font-size:13px;font-weight:600;color:var(--muted);cursor:pointer;font-family:inherit}
 .btn-clear:hover{border-color:var(--blue);color:var(--blue);background:var(--light-blue)}
@@ -162,6 +170,14 @@ input.err,select.err,textarea.err{border-color:#e03a3a!important}
 
   <div class="generated-note" id="generated-note">
     <strong>Editable draft downloaded.</strong> Save the JSON draft with your PDF. To revise this proposal later, open this HTML tool and click <strong>Open Previous Proposal</strong>, then select the JSON file.
+  </div>
+
+  <div class="autosave-banner" id="autosave-banner">
+    <span id="autosave-banner-text"></span>
+    <div class="autosave-banner-actions">
+      <button type="button" class="btn-autosave-restore" onclick="restoreAutosave()">Restore</button>
+      <button type="button" class="btn-autosave-discard" onclick="discardAutosave()">Discard</button>
+    </div>
   </div>
 
   <div class="error-summary" id="error-summary" aria-live="polite"></div>
@@ -378,7 +394,7 @@ input.err,select.err,textarea.err{border-color:#e03a3a!important}
 
           <tr>
             <td><div class="service-name">Air Sealing</div></td>
-            <td><div class="price-input-wrap"><input type="number" class="price-input core-price" id="p-airsealing" placeholder="0.00" min="0" step="0.01" oninput="calcTotal()"></div></td>
+            <td><div class="price-input-wrap"><input type="text" inputmode="decimal" class="price-input core-price range-price" id="p-airsealing" placeholder="0.00" title="Single price or range, e.g. 800-1100" oninput="calcTotal()"></div></td>
           </tr>
 
           <!-- ADDITIONAL SERVICES (NOT in total) -->
@@ -394,28 +410,28 @@ input.err,select.err,textarea.err{border-color:#e03a3a!important}
           <tr class="manuals-conv-row manuals-sys-label" style="display:none"><td colspan="2"><span>Conventional</span></td></tr>
           <tr class="manuals-conv-row">
             <td><div class="service-name">Manuals (Manual J, D &amp; S)</div></td>
-            <td><div class="price-input-wrap"><input type="number" class="price-input addl-price" id="p-manuals" placeholder="0.00" min="0" step="0.01" oninput="calcTotal()"></div></td>
+            <td><div class="price-input-wrap"><input type="text" inputmode="decimal" class="price-input addl-price range-price" id="p-manuals" placeholder="0.00" title="Single price or range, e.g. 800-1100" oninput="calcTotal()"></div></td>
           </tr>
           <tr class="manuals-conv-row">
             <td><div class="service-name">Manuals (Manual J &amp; S)</div></td>
-            <td><div class="price-input-wrap"><input type="number" class="price-input addl-price" id="p-manuals-js" placeholder="0.00" min="0" step="0.01" oninput="calcTotal()"></div></td>
+            <td><div class="price-input-wrap"><input type="text" inputmode="decimal" class="price-input addl-price range-price" id="p-manuals-js" placeholder="0.00" title="Single price or range, e.g. 800-1100" oninput="calcTotal()"></div></td>
           </tr>
           <tr class="sub-item manuals-conv-row">
             <td><div class="service-name">↳ Manuals — Per Option</div></td>
-            <td><div class="price-input-wrap"><input type="number" class="price-input addl-price" id="p-manuals-option" placeholder="0.00" min="0" step="0.01" oninput="calcTotal()"></div></td>
+            <td><div class="price-input-wrap"><input type="text" inputmode="decimal" class="price-input addl-price range-price" id="p-manuals-option" placeholder="0.00" title="Single price or range, e.g. 800-1100" oninput="calcTotal()"></div></td>
           </tr>
           <tr class="manuals-rheia-row manuals-sys-label" style="display:none"><td colspan="2"><span>Rheia</span></td></tr>
           <tr class="manuals-rheia-row" style="display:none">
             <td><div class="service-name">Manuals (Manual J, D &amp; S)</div></td>
-            <td><div class="price-input-wrap"><input type="number" class="price-input addl-price" id="p-manuals-rheia" placeholder="0.00" min="0" step="0.01" disabled oninput="calcTotal()"></div></td>
+            <td><div class="price-input-wrap"><input type="text" inputmode="decimal" class="price-input addl-price range-price" id="p-manuals-rheia" placeholder="0.00" title="Single price or range, e.g. 800-1100" disabled oninput="calcTotal()"></div></td>
           </tr>
           <tr class="manuals-rheia-row" style="display:none">
             <td><div class="service-name">Manuals (Manual J &amp; S)</div></td>
-            <td><div class="price-input-wrap"><input type="number" class="price-input addl-price" id="p-manuals-js-rheia" placeholder="0.00" min="0" step="0.01" disabled oninput="calcTotal()"></div></td>
+            <td><div class="price-input-wrap"><input type="text" inputmode="decimal" class="price-input addl-price range-price" id="p-manuals-js-rheia" placeholder="0.00" title="Single price or range, e.g. 800-1100" disabled oninput="calcTotal()"></div></td>
           </tr>
           <tr class="sub-item manuals-rheia-row" style="display:none">
             <td><div class="service-name">↳ Manuals — Per Option</div></td>
-            <td><div class="price-input-wrap"><input type="number" class="price-input addl-price" id="p-manuals-option-rheia" placeholder="0.00" min="0" step="0.01" disabled oninput="calcTotal()"></div></td>
+            <td><div class="price-input-wrap"><input type="text" inputmode="decimal" class="price-input addl-price range-price" id="p-manuals-option-rheia" placeholder="0.00" title="Single price or range, e.g. 800-1100" disabled oninput="calcTotal()"></div></td>
           </tr>
           <tr>
             <td colspan="2" style="padding:4px 12px 12px">
@@ -566,6 +582,10 @@ input.err,select.err,textarea.err{border-color:#e03a3a!important}
   <div class="gen-bar">
     <div class="filename-preview" id="filename-preview">Fill in client name, city &amp; state to preview file name</div>
     <button class="btn-clear" onclick="clearForm()">Clear</button>
+    <button class="btn-preview" onclick="generateProposal(true)" title="Opens the print preview without downloading anything">
+      <svg width="15" height="15" fill="none" viewBox="0 0 24 24"><path stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle stroke="currentColor" stroke-width="2.5" cx="12" cy="12" r="3"/></svg>
+      Preview PDF
+    </button>
     <button class="btn-generate" onclick="generateProposal()">
       <svg width="15" height="15" fill="none" viewBox="0 0 24 24"><path stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" points="14 2 14 8 20 8"/></svg>
       Generate PDF + Save Editable Draft
@@ -692,6 +712,9 @@ window.addEventListener('DOMContentLoaded', () => {
     loadInput.addEventListener('change', handleFileLoad);
   }
   updateFilename();
+  window.__defaultPrices = collectData(true).prices;
+  setupAutosave();
+  checkAutosaveRestore();
 });
 
 // ── MANUALS DUCT SYSTEM TYPE ──
@@ -711,6 +734,80 @@ function updateManualsUI() {
   };
   toggleRows('manuals-conv-row', conv);
   toggleRows('manuals-rheia-row', rheia);
+}
+
+// ── AUTOSAVE / CRASH RECOVERY ──
+const AUTOSAVE_KEY = 'tacoma_proposal_autosave_v1';
+let __autosaveTimer = null;
+
+function autosaveMeaningful(d) {
+  if (!d) return false;
+  if ((d.clientName||'').trim() || (d.clientContact||'').trim() || (d.clientEmail||'').trim()) return true;
+  // Ignore prices that match the form's prefilled defaults (retest, trip, HVAC extra, etc.)
+  const defaults = window.__defaultPrices || {};
+  if (d.prices && Object.entries(d.prices).some(([id, v]) => {
+    const r = parsePriceRange(v);
+    if (!r || r.hi <= 0) return false;
+    const dv = parsePriceRange(defaults[id]);
+    return !(dv && dv.lo === r.lo && dv.hi === r.hi);
+  })) return true;
+  if (d.otherRows && d.otherRows.some(r => (r.desc||'').trim() || (r.price||'').trim())) return true;
+  return false;
+}
+function saveAutosave() {
+  try {
+    const d = collectData(true);
+    if (!autosaveMeaningful(d)) return;
+    localStorage.setItem(AUTOSAVE_KEY, JSON.stringify({ t: Date.now(), d }));
+  } catch (e) { /* private mode / quota — autosave silently unavailable */ }
+}
+function scheduleAutosave() {
+  clearTimeout(__autosaveTimer);
+  __autosaveTimer = setTimeout(saveAutosave, 800);
+}
+function clearAutosave() {
+  try { localStorage.removeItem(AUTOSAVE_KEY); } catch (e) {}
+}
+function setupAutosave() {
+  document.addEventListener('input', e => {
+    if (e.target && e.target.id === 'load-file-input') return;
+    scheduleAutosave();
+  });
+  document.addEventListener('change', e => {
+    if (e.target && e.target.id === 'load-file-input') return;
+    scheduleAutosave();
+  });
+  window.addEventListener('beforeunload', saveAutosave);
+}
+function checkAutosaveRestore() {
+  let saved = null;
+  try { saved = JSON.parse(localStorage.getItem(AUTOSAVE_KEY) || 'null'); } catch (e) {}
+  if (!saved || !saved.d || !autosaveMeaningful(saved.d)) return;
+  // Don't nag if the form already has content (e.g. prefilled via onboarding JSON)
+  const current = collectData(true);
+  if (autosaveMeaningful(current)) return;
+  const banner = document.getElementById('autosave-banner');
+  if (!banner) return;
+  const when = new Date(saved.t);
+  const whenStr = when.toLocaleDateString('en-US',{month:'short',day:'numeric'}) + ' ' +
+                  when.toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit'});
+  const who = (saved.d.clientName||'').trim();
+  document.getElementById('autosave-banner-text').innerHTML =
+    '<strong>Unsaved proposal found</strong> — ' + (who ? 'for <strong>'+htmlAttr(who)+'</strong>, ' : '') + 'last edited ' + whenStr + '. Restore it?';
+  banner.style.display = 'flex';
+}
+function restoreAutosave() {
+  let saved = null;
+  try { saved = JSON.parse(localStorage.getItem(AUTOSAVE_KEY) || 'null'); } catch (e) {}
+  const banner = document.getElementById('autosave-banner');
+  if (banner) banner.style.display = 'none';
+  if (!saved || !saved.d) return;
+  restoreData(saved.d);
+}
+function discardAutosave() {
+  clearAutosave();
+  const banner = document.getElementById('autosave-banner');
+  if (banner) banner.style.display = 'none';
 }
 
 // ── BILLING PREFILL ──
@@ -751,20 +848,24 @@ function toggleSpecialtyPanel() {
 }
 
 function calcTotal() {
-  let total = 0;
+  let lo = 0, hi = 0;
   document.querySelectorAll('.core-price').forEach(el => {
-    total += parseFloat(el.value||0)||0;
+    const r = parsePriceRange(el.value);
+    if (r) { lo += r.lo; hi += r.hi; }
   });
   // Also catch dynamically created individual testing inputs by ID
   ['p-test-blowerdoor','p-test-ductblaster','p-test-mechvent'].forEach(id => {
     const el = document.getElementById(id);
     // Only add if not already counted via core-price class
     if (el && !el.classList.contains('core-price')) {
-      total += parseFloat(el.value||0)||0;
+      const v = parseFloat(el.value||0)||0;
+      lo += v; hi += v;
     }
   });
   const el = document.getElementById('audit-fee-total');
-  el.value = total > 0 ? '$'+total.toFixed(2)+' per house / unit' : '';
+  el.value = hi > 0
+    ? (lo === hi ? '$'+lo.toFixed(2) : '$'+lo.toFixed(2)+' – $'+hi.toFixed(2)) + ' per house / unit'
+    : '';
 }
 
 // ── TESTING UI ──
@@ -928,8 +1029,28 @@ function formatMoneyValue(value) {
   const n = parseFloat(raw);
   return Number.isFinite(n) ? n.toFixed(2) : '';
 }
+// Parse a price that may be a single value ("800") or a range ("800-1100").
+// Returns {lo, hi} or null if empty/invalid.
+function parsePriceRange(raw) {
+  const s = String(raw ?? '').replace(/[$,\s]/g, '');
+  if (!s) return null;
+  const m = s.match(/^(\d+(?:\.\d+)?)-?$|^(\d+(?:\.\d+)?)-(\d+(?:\.\d+)?)$/);
+  if (!m) return null;
+  if (m[1] !== undefined) { const v = parseFloat(m[1]); return { lo: v, hi: v }; }
+  const a = parseFloat(m[2]), b = parseFloat(m[3]);
+  return { lo: Math.min(a, b), hi: Math.max(a, b) };
+}
+function formatRangeValue(raw) {
+  const r = parsePriceRange(raw);
+  if (!r) return '';
+  return r.lo === r.hi ? r.lo.toFixed(2) : r.lo.toFixed(2) + '-' + r.hi.toFixed(2);
+}
 function formatMoneyField(el) {
   if (!el || String(el.value || '').trim() === '') return;
+  if (el.classList && el.classList.contains('range-price')) {
+    el.value = formatRangeValue(el.value);
+    return;
+  }
   el.value = formatMoneyValue(el.value);
 }
 function syncComplianceRevisions() {
@@ -1001,9 +1122,11 @@ function normalizeFormFields() {
 }
 
 // ── COLLECT DATA ──
-function collectData() {
-  normalizeFormFields();
-  syncComplianceRevisions();
+function collectData(skipNormalize) {
+  if (!skipNormalize) {
+    normalizeFormFields();
+    syncComplianceRevisions();
+  }
   const priceIds = ['p-compliance','p-prebatt','p-predrywall','p-final','p-airsealing',
     'p-testing-bundled','p-test-blowerdoor','p-test-ductblaster','p-test-mechvent',
     'p-compliance-revisions-simple','p-compliance-revisions-complex','p-manuals','p-manuals-js','p-manuals-option','p-manuals-rheia','p-manuals-js-rheia','p-manuals-option-rheia','p-hvac-drawing','p-retest','p-trip','p-hvac-extra',
@@ -1218,6 +1341,7 @@ function handleFileLoad(e) {
 // ── CLEAR ──
 function clearForm() {
   if (!confirm('Clear all fields?')) return;
+  clearAutosave();
   document.querySelectorAll('input:not([type=date]):not([type=checkbox]),select,textarea').forEach(el => {
     if (el.tagName==='SELECT') el.selectedIndex=0; else el.value='';
   });
@@ -1285,7 +1409,9 @@ function hasAnyPricing() {
   const priceIds = ['p-compliance','p-prebatt','p-predrywall','p-final','p-airsealing','p-testing-bundled','p-test-blowerdoor','p-test-ductblaster','p-test-mechvent','p-compliance-revisions-simple','p-compliance-revisions-complex','p-manuals','p-manuals-js','p-manuals-option','p-manuals-rheia','p-manuals-js-rheia','p-manuals-option-rheia','p-hvac-drawing','p-retest','p-trip','p-hvac-extra','p-duct-sealing','p-no-burn','p-cert-fee','p-street-cleaning'];
   const basePrices = priceIds.some(id => {
     const el = document.getElementById(id);
-    return el && !el.disabled && parseFloat(el.value || 0) > 0;
+    if (!el || el.disabled) return false;
+    const r = parsePriceRange(el.value);
+    return !!(r && r.hi > 0);
   });
   const customPrices = Array.from(document.querySelectorAll('.other-row input[type=number]')).some(el => parseFloat(el.value || 0) > 0);
   return basePrices || customPrices;
@@ -1338,17 +1464,24 @@ function validate(d) {
   return true;
 }
 // ── GENERATE ──
-function generateProposal() {
+function generateProposal(previewOnly) {
   const d = collectData();
   if (!validate(d)) return;
   setErrorSummary([]);
   updateReviewChecklist();
 
-  const draftFilename = downloadEditableDraft(d);
   const note = document.getElementById('generated-note');
-  if (note) {
-    note.style.display = 'block';
-    note.innerHTML = '<strong>Editable file downloaded:</strong> '+draftFilename+'<br>Next, choose <strong>Save as PDF</strong> in the print dialog. Name the PDF <strong>'+proposalOutputBase(d)+'.pdf</strong> and keep it with the JSON file.';
+  if (previewOnly) {
+    if (note) {
+      note.style.display = 'block';
+      note.innerHTML = '<strong>Preview only</strong> — nothing was downloaded. Use <strong>Generate PDF + Save Editable Draft</strong> when you\'re ready for the final copy.';
+    }
+  } else {
+    const draftFilename = downloadEditableDraft(d);
+    if (note) {
+      note.style.display = 'block';
+      note.innerHTML = '<strong>Editable file downloaded:</strong> '+draftFilename+'<br>Next, choose <strong>Save as PDF</strong> in the print dialog. Name the PDF <strong>'+proposalOutputBase(d)+'.pdf</strong> and keep it with the JSON file.';
+    }
   }
 
   const fmtP = v => '$'+parseFloat(v).toFixed(2);
@@ -1418,21 +1551,26 @@ function generateProposal() {
     }
   }
 
-  const airSealingVal = val('p-airsealing');
-  if (airSealingVal > 0) {
-    coreRows += `<div class="prop-fee-row"><span class="prop-fee-row-label">Air Sealing</span><span class="prop-fee-row-price">${fmtP(airSealingVal)}</span></div>`;
-    coreTotal += airSealingVal;
+  const fmtRange = r => r.lo === r.hi ? fmtP(r.lo) : fmtP(r.lo)+' – '+fmtP(r.hi);
+  const airRange = parsePriceRange(d.prices['p-airsealing']);
+  let coreLo = coreTotal, coreHi = coreTotal;
+  if (airRange && airRange.hi > 0) {
+    coreRows += `<div class="prop-fee-row"><span class="prop-fee-row-label">Air Sealing</span><span class="prop-fee-row-price">${fmtRange(airRange)}</span></div>`;
+    coreLo += airRange.lo;
+    coreHi += airRange.hi;
   }
 
-  const auditFeeDisplay = coreTotal > 0 ? fmtP(coreTotal)+' per house / unit' : '';
+  const auditFeeDisplay = coreHi > 0
+    ? (coreLo === coreHi ? fmtP(coreLo) : fmtP(coreLo)+' – '+fmtP(coreHi)) + ' per house / unit'
+    : '';
 
   // Additional services
   let addlRows = '';
   const msConv  = d.manualsConventional === undefined ? true : d.manualsConventional;
   const msRheia = !!d.manualsRheia;
   const manualRow = (id, label) => {
-    const v = val(id);
-    return v > 0 ? `<div class="prop-addl-row"><span>${label}</span><span class="prop-addl-price">${fmtP(v)}</span></div>` : '';
+    const r = parsePriceRange(d.prices[id]);
+    return (r && r.hi > 0) ? `<div class="prop-addl-row"><span>${label}</span><span class="prop-addl-price">${fmtRange(r)}</span></div>` : '';
   };
   const manualGroup = (sysLabel, ids) => {
     const rows =
@@ -1447,7 +1585,7 @@ function generateProposal() {
   if (msConv)  addlRows += manualGroup('Manuals — Conventional', ['p-manuals','p-manuals-js','p-manuals-option']);
   if (msRheia) addlRows += manualGroup('Manuals — Rheia', ['p-manuals-rheia','p-manuals-js-rheia','p-manuals-option-rheia']);
   if (!msConv && !msRheia) addlRows += manualGroup('', ['p-manuals','p-manuals-js','p-manuals-option']);
-  const anyManualsPriced = ['p-manuals','p-manuals-js','p-manuals-option','p-manuals-rheia','p-manuals-js-rheia','p-manuals-option-rheia'].some(id => val(id) > 0);
+  const anyManualsPriced = ['p-manuals','p-manuals-js','p-manuals-option','p-manuals-rheia','p-manuals-js-rheia','p-manuals-option-rheia'].some(id => { const r = parsePriceRange(d.prices[id]); return r && r.hi > 0; });
   if (d.manualsNotes && anyManualsPriced) {
     addlRows += `<div style="font-size:9.5pt;color:#666;font-style:italic;padding:3pt 0 4pt">${d.manualsNotes}</div>`;
   }
