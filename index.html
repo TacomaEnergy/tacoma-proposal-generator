@@ -633,6 +633,9 @@ body.printing{font-family:'Helvetica Neue',Arial,sans-serif}
 /* Additional services */
 .prop-addl-header{font-size:8.75pt;font-weight:700;color:#444;text-transform:uppercase;letter-spacing:0.45px;margin-bottom:4pt;margin-top:8pt;padding-bottom:3pt;border-bottom:0.75pt solid #ddd}
 .prop-addl-note{font-size:8.25pt;color:#666;font-style:italic;margin-bottom:5pt;line-height:1.3}
+.prop-addl-group-label{font-size:8.5pt;font-weight:700;color:#0B3D6B;text-transform:uppercase;letter-spacing:0.5px;margin:6pt 0 1pt;padding-bottom:2pt;border-bottom:0.5pt solid #d5dde6}
+.prop-addl-group .prop-addl-row{padding-left:8pt}
+.prop-addl-group:last-of-type{margin-bottom:3pt}
 .prop-addl-row{display:flex;justify-content:space-between;align-items:baseline;padding:2pt 0;border-bottom:0.5pt solid #eee;font-size:8.75pt}
 .prop-addl-row:last-child{border-bottom:none}
 .prop-addl-price{font-weight:600;color:#333;padding-left:9pt;white-space:nowrap}
@@ -1428,22 +1431,23 @@ function generateProposal() {
   let addlRows = '';
   const msConv  = d.manualsConventional === undefined ? true : d.manualsConventional;
   const msRheia = !!d.manualsRheia;
-  const addlDefs = [];
-  const manualSet = (sysLabel, ids) => {
-    const sfx = sysLabel ? ' — '+sysLabel : '';
-    addlDefs.push(
-      {id:ids[0], label:'Manual J, D &amp; S'+sfx+' (per model/base house)'},
-      {id:ids[1], label:'Manual J &amp; S'+sfx+' (per model/base house)'},
-      {id:ids[2], label:'Per Option'+sfx+' (after model/base house)'}
-    );
+  const manualRow = (id, label) => {
+    const v = val(id);
+    return v > 0 ? `<div class="prop-addl-row"><span>${label}</span><span class="prop-addl-price">${fmtP(v)}</span></div>` : '';
   };
-  if (msConv)  manualSet(msRheia ? 'Conventional' : '', ['p-manuals','p-manuals-js','p-manuals-option']);
-  if (msRheia) manualSet('Rheia', ['p-manuals-rheia','p-manuals-js-rheia','p-manuals-option-rheia']);
-  if (!msConv && !msRheia) manualSet('', ['p-manuals','p-manuals-js','p-manuals-option']);
-  addlDefs.forEach(s => {
-    const v = val(s.id);
-    if (v > 0) addlRows+=`<div class="prop-addl-row"><span>${s.label}</span><span class="prop-addl-price">${fmtP(v)}</span></div>`;
-  });
+  const manualGroup = (sysLabel, ids) => {
+    const rows =
+      manualRow(ids[0], 'Manual J, D &amp; S (per model/base house)') +
+      manualRow(ids[1], 'Manual J &amp; S (per model/base house)') +
+      manualRow(ids[2], 'Per Option (after model/base house)');
+    if (!rows) return '';
+    return sysLabel
+      ? `<div class="prop-addl-group-label">${sysLabel}</div><div class="prop-addl-group">${rows}</div>`
+      : rows;
+  };
+  if (msConv)  addlRows += manualGroup('Manuals — Conventional', ['p-manuals','p-manuals-js','p-manuals-option']);
+  if (msRheia) addlRows += manualGroup('Manuals — Rheia', ['p-manuals-rheia','p-manuals-js-rheia','p-manuals-option-rheia']);
+  if (!msConv && !msRheia) addlRows += manualGroup('', ['p-manuals','p-manuals-js','p-manuals-option']);
   const anyManualsPriced = ['p-manuals','p-manuals-js','p-manuals-option','p-manuals-rheia','p-manuals-js-rheia','p-manuals-option-rheia'].some(id => val(id) > 0);
   if (d.manualsNotes && anyManualsPriced) {
     addlRows += `<div style="font-size:9.5pt;color:#666;font-style:italic;padding:3pt 0 4pt">${d.manualsNotes}</div>`;
