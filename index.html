@@ -51,6 +51,8 @@ input.err,select.err,textarea.err{border-color:#e03a3a!important}
 .test-checks{display:flex;gap:16px;flex-wrap:wrap;margin-bottom:10px}
 .test-check{display:flex;align-items:center;gap:6px;font-size:13px;font-weight:500;cursor:pointer}
 .test-check input[type=checkbox]{width:16px;height:16px;accent-color:var(--blue);cursor:pointer}
+.manuals-sys-label td{background:#F8FAFC;padding:6px 12px;border-bottom:1px solid #F0F4F8}
+.manuals-sys-label span{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:var(--blue)}
 .trip-row td{background:var(--amber-bg)!important;border-left:3px solid var(--amber)}
 .trip-row .service-name{color:#8C5E00}
 .compliance-revision-row.revision-disabled td{background:#F7F7F7!important;border-left-color:#D1D5DB!important;opacity:.72}
@@ -382,16 +384,39 @@ input.err,select.err,textarea.err{border-color:#e03a3a!important}
           <!-- ADDITIONAL SERVICES (NOT in total) -->
           <tr><td colspan="2" class="section-divider"><span>Additional Services — NOT included in Total Audit Fee</span></td></tr>
           <tr>
+            <td colspan="2" style="padding:12px 12px 4px">
+              <label style="margin-bottom:8px">Manuals — Duct System Type</label>
+              <div class="test-checks" style="margin-bottom:4px">
+                <label class="test-check"><input type="checkbox" id="ms-conventional" checked onchange="updateManualsUI()"> Conventional</label>
+                <label class="test-check"><input type="checkbox" id="ms-rheia" onchange="updateManualsUI()"> Rheia</label>
+              </div>
+            </td>
+          </tr>
+          <tr class="manuals-conv-row manuals-sys-label" style="display:none"><td colspan="2"><span>Conventional</span></td></tr>
+          <tr class="manuals-conv-row">
             <td><div class="service-name">Manuals (Manual J, D &amp; S)</div></td>
             <td><div class="price-input-wrap"><input type="number" class="price-input addl-price" id="p-manuals" placeholder="0.00" min="0" step="0.01" oninput="calcTotal()"></div></td>
           </tr>
-          <tr>
+          <tr class="manuals-conv-row">
             <td><div class="service-name">Manuals (Manual J &amp; S)</div></td>
             <td><div class="price-input-wrap"><input type="number" class="price-input addl-price" id="p-manuals-js" placeholder="0.00" min="0" step="0.01" oninput="calcTotal()"></div></td>
           </tr>
-          <tr class="sub-item">
+          <tr class="sub-item manuals-conv-row">
             <td><div class="service-name">↳ Manuals — Per Option</div></td>
             <td><div class="price-input-wrap"><input type="number" class="price-input addl-price" id="p-manuals-option" placeholder="0.00" min="0" step="0.01" oninput="calcTotal()"></div></td>
+          </tr>
+          <tr class="manuals-rheia-row manuals-sys-label" style="display:none"><td colspan="2"><span>Rheia</span></td></tr>
+          <tr class="manuals-rheia-row" style="display:none">
+            <td><div class="service-name">Manuals (Manual J, D &amp; S)</div></td>
+            <td><div class="price-input-wrap"><input type="number" class="price-input addl-price" id="p-manuals-rheia" placeholder="0.00" min="0" step="0.01" disabled oninput="calcTotal()"></div></td>
+          </tr>
+          <tr class="manuals-rheia-row" style="display:none">
+            <td><div class="service-name">Manuals (Manual J &amp; S)</div></td>
+            <td><div class="price-input-wrap"><input type="number" class="price-input addl-price" id="p-manuals-js-rheia" placeholder="0.00" min="0" step="0.01" disabled oninput="calcTotal()"></div></td>
+          </tr>
+          <tr class="sub-item manuals-rheia-row" style="display:none">
+            <td><div class="service-name">↳ Manuals — Per Option</div></td>
+            <td><div class="price-input-wrap"><input type="number" class="price-input addl-price" id="p-manuals-option-rheia" placeholder="0.00" min="0" step="0.01" disabled oninput="calcTotal()"></div></td>
           </tr>
           <tr>
             <td colspan="2" style="padding:4px 12px 12px">
@@ -657,6 +682,7 @@ window.addEventListener('DOMContentLoaded', () => {
   if (!document.getElementById('p-retest').value) document.getElementById('p-retest').value = '250.00';
   if (!document.getElementById('p-trip').value) document.getElementById('p-trip').value = '125.00';
   syncComplianceRevisions();
+  updateManualsUI();
   setupMoneyFormatting();
   formatAllMoneyInputs();
   const loadInput = document.getElementById('load-file-input');
@@ -665,6 +691,25 @@ window.addEventListener('DOMContentLoaded', () => {
   }
   updateFilename();
 });
+
+// ── MANUALS DUCT SYSTEM TYPE ──
+function updateManualsUI() {
+  const conv  = document.getElementById('ms-conventional').checked;
+  const rheia = document.getElementById('ms-rheia').checked;
+  const both  = conv && rheia;
+  const toggleRows = (cls, show) => {
+    document.querySelectorAll('tr.'+cls).forEach(tr => {
+      const isLabel = tr.classList.contains('manuals-sys-label');
+      tr.style.display = (isLabel ? both : show) ? '' : 'none';
+      tr.querySelectorAll('input').forEach(inp => {
+        inp.disabled = !show;
+        if (!show) inp.value = '';
+      });
+    });
+  };
+  toggleRows('manuals-conv-row', conv);
+  toggleRows('manuals-rheia-row', rheia);
+}
 
 // ── BILLING PREFILL ──
 function prefillBilling() {
@@ -959,7 +1004,7 @@ function collectData() {
   syncComplianceRevisions();
   const priceIds = ['p-compliance','p-prebatt','p-predrywall','p-final','p-airsealing',
     'p-testing-bundled','p-test-blowerdoor','p-test-ductblaster','p-test-mechvent',
-    'p-compliance-revisions-simple','p-compliance-revisions-complex','p-manuals','p-manuals-js','p-manuals-option','p-hvac-drawing','p-retest','p-trip','p-hvac-extra',
+    'p-compliance-revisions-simple','p-compliance-revisions-complex','p-manuals','p-manuals-js','p-manuals-option','p-manuals-rheia','p-manuals-js-rheia','p-manuals-option-rheia','p-hvac-drawing','p-retest','p-trip','p-hvac-extra',
     'p-duct-sealing','p-no-burn','p-cert-fee','p-street-cleaning'];
   const prices = {};
   priceIds.forEach(id => { const el=document.getElementById(id); prices[id]=el?el.value:''; });
@@ -993,6 +1038,8 @@ function collectData() {
     tcDuctblaster: document.getElementById('tc-ductblaster').checked,
     tcMechvent:    document.getElementById('tc-mechvent').checked,
     manualsNotes:  document.getElementById('manuals-notes').value,
+    manualsConventional: document.getElementById('ms-conventional').checked,
+    manualsRheia:  document.getElementById('ms-rheia').checked,
     retestWaived:  document.getElementById('retest-waived').checked,
     tripFirstFree: document.getElementById('trip-first-free').checked,
     tripWaived:    document.getElementById('trip-waived')?.checked || false,
@@ -1044,6 +1091,10 @@ function restoreData(d) {
       const el=document.getElementById(id); if(el && d.prices[id]) el.value=d.prices[id];
     });
   }
+  // Manuals duct system type (older saved drafts default to Conventional)
+  setChk('ms-conventional', d.manualsConventional === undefined ? true : d.manualsConventional);
+  setChk('ms-rheia', !!d.manualsRheia);
+  updateManualsUI();
   const list = document.getElementById('other-services-list');
   list.innerHTML = '';
   const rows = d.otherRows&&d.otherRows.length ? d.otherRows : [{desc:'',price:''}];
@@ -1169,6 +1220,8 @@ function clearForm() {
     if (el.tagName==='SELECT') el.selectedIndex=0; else el.value='';
   });
   document.querySelectorAll('input[type=checkbox]').forEach(el => el.checked=false);
+  document.getElementById('ms-conventional').checked = true;
+  updateManualsUI();
   const d2 = new Date();
   document.getElementById('proposal-date').value =
     d2.getFullYear()+'-'+String(d2.getMonth()+1).padStart(2,'0')+'-'+String(d2.getDate()).padStart(2,'0');
@@ -1227,7 +1280,7 @@ function hasValue(id) {
   return !!(el && String(el.value || '').trim());
 }
 function hasAnyPricing() {
-  const priceIds = ['p-compliance','p-prebatt','p-predrywall','p-final','p-airsealing','p-testing-bundled','p-test-blowerdoor','p-test-ductblaster','p-test-mechvent','p-compliance-revisions-simple','p-compliance-revisions-complex','p-manuals','p-manuals-js','p-manuals-option','p-hvac-drawing','p-retest','p-trip','p-hvac-extra','p-duct-sealing','p-no-burn','p-cert-fee','p-street-cleaning'];
+  const priceIds = ['p-compliance','p-prebatt','p-predrywall','p-final','p-airsealing','p-testing-bundled','p-test-blowerdoor','p-test-ductblaster','p-test-mechvent','p-compliance-revisions-simple','p-compliance-revisions-complex','p-manuals','p-manuals-js','p-manuals-option','p-manuals-rheia','p-manuals-js-rheia','p-manuals-option-rheia','p-hvac-drawing','p-retest','p-trip','p-hvac-extra','p-duct-sealing','p-no-burn','p-cert-fee','p-street-cleaning'];
   const basePrices = priceIds.some(id => {
     const el = document.getElementById(id);
     return el && !el.disabled && parseFloat(el.value || 0) > 0;
@@ -1373,16 +1426,26 @@ function generateProposal() {
 
   // Additional services
   let addlRows = '';
-  const addlDefs = [
-    {id:'p-manuals',              label:'Manual J, D &amp; S (per model/base house)'},
-    {id:'p-manuals-js',           label:'Manual J &amp; S (per model/base house)'},
-    {id:'p-manuals-option',       label:'Per Option (after model/base house)'},
-  ];
+  const msConv  = d.manualsConventional === undefined ? true : d.manualsConventional;
+  const msRheia = !!d.manualsRheia;
+  const addlDefs = [];
+  const manualSet = (sysLabel, ids) => {
+    const sfx = sysLabel ? ' — '+sysLabel : '';
+    addlDefs.push(
+      {id:ids[0], label:'Manual J, D &amp; S'+sfx+' (per model/base house)'},
+      {id:ids[1], label:'Manual J &amp; S'+sfx+' (per model/base house)'},
+      {id:ids[2], label:'Per Option'+sfx+' (after model/base house)'}
+    );
+  };
+  if (msConv)  manualSet(msRheia ? 'Conventional' : '', ['p-manuals','p-manuals-js','p-manuals-option']);
+  if (msRheia) manualSet('Rheia', ['p-manuals-rheia','p-manuals-js-rheia','p-manuals-option-rheia']);
+  if (!msConv && !msRheia) manualSet('', ['p-manuals','p-manuals-js','p-manuals-option']);
   addlDefs.forEach(s => {
     const v = val(s.id);
     if (v > 0) addlRows+=`<div class="prop-addl-row"><span>${s.label}</span><span class="prop-addl-price">${fmtP(v)}</span></div>`;
   });
-  if (d.manualsNotes && (val('p-manuals')>0 || val('p-manuals-js')>0 || val('p-manuals-option')>0)) {
+  const anyManualsPriced = ['p-manuals','p-manuals-js','p-manuals-option','p-manuals-rheia','p-manuals-js-rheia','p-manuals-option-rheia'].some(id => val(id) > 0);
+  if (d.manualsNotes && anyManualsPriced) {
     addlRows += `<div style="font-size:9.5pt;color:#666;font-style:italic;padding:3pt 0 4pt">${d.manualsNotes}</div>`;
   }
   const hvacDrawingVal = val('p-hvac-drawing');
