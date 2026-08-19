@@ -1628,7 +1628,7 @@ function generateProposal(previewOnly) {
   if (!tripWaived && tripVal > 0)
     chargeRows += `<div class="prop-charge-row"><span class="prop-charge-label">Trip Charge / Re-inspection Fee${tripFirstFree ? '<span class="prop-charge-sub">first trip charge is free</span>' : ''}</span><span class="prop-charge-price">${fmtP(tripVal)}</span></div>`;
   if (!hvacWaived && hvacVal > 0)
-    chargeRows += `<div class="prop-charge-row"><span class="prop-charge-label">Additional HVAC System Fee<span class="prop-charge-sub">per system over 1</span></span><span class="prop-charge-price">${fmtP(hvacVal)}</span></div>`;
+    chargeRows += `<div class="prop-charge-row"><span class="prop-charge-label">Additional HVAC System Fee<span class="prop-charge-sub">Per HVAC system over 2</span></span><span class="prop-charge-price">${fmtP(hvacVal)}</span></div>`;
   const tripBox = chargeRows ? `<div class="prop-charges-box">${chargeRows}</div>` : '';
 
   const hasAddl = addlRows || tripBox;
