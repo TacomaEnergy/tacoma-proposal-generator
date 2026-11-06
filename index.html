@@ -145,7 +145,7 @@ input.err,select.err,textarea.err{border-color:#e03a3a!important}
   <div class="app-header-text">
     <h1>Energy Audit Proposal Generator</h1>
     <p>Fill in the form · Generate PDF · Keep editable JSON drafts for future revisions</p>
-    <p style="color:#7FA3C4;font-size:11px;margin-top:3px">Last updated: Nov 4, 2026 · All continental US states added</p>
+    <p style="color:#7FA3C4;font-size:11px;margin-top:3px">Last updated: Nov 6, 2026 · Rep list, HVAC wording & certification fee text synced with onboarding</p>
   </div>
 </div>
 
@@ -189,7 +189,7 @@ input.err,select.err,textarea.err{border-color:#e03a3a!important}
       <select id="rep">
         <option value="">Select rep...</option>
         <option>C. Gaston</option><option>N. Reynolds</option><option>B. Sebastian</option>
-        <option>A. Palumbo</option><option>A. Choez</option><option>Admin</option>
+        <option>A. Palumbo</option><option>Admin</option>
       </select>
     </div>
     <div class="col">
@@ -532,7 +532,7 @@ input.err,select.err,textarea.err{border-color:#e03a3a!important}
               </tr>
               <tr>
                 <td><div class="service-name">Certification Fee</div></td>
-                <td style="text-align:center"><div class="price-input-wrap" style="max-width:130px;margin:0 auto"><input type="number" class="price-input addl-price" id="p-cert-fee" placeholder="0.00" min="0" step="0.01" oninput="calcTotal()"></div></td>
+                <td style="text-align:center"><div class="price-input-wrap" style="max-width:130px;margin:0 auto"><input type="text" class="price-input addl-price" id="p-cert-fee" data-free-text="1" placeholder="0.00 or note" title="Enter an amount, or text like &quot;250 per home&quot;" oninput="calcTotal()"></div></td>
               </tr>
               <tr>
                 <td><div class="service-name">Street Cleaning</div></td>
@@ -1054,6 +1054,8 @@ function formatRangeValue(raw) {
 }
 function formatMoneyField(el) {
   if (!el || String(el.value || '').trim() === '') return;
+  // Free-text fields (e.g. Certification Fee): only format when it is a plain number
+  if (el.dataset && el.dataset.freeText && !/^\s*\$?\s*[\d,]*\.?\d+\s*$/.test(el.value)) return;
   if (el.classList && el.classList.contains('range-price')) {
     el.value = formatRangeValue(el.value);
     return;
@@ -1252,7 +1254,7 @@ function restoreData(d) {
   formatAllMoneyInputs();
   // Auto-open specialty panel if any specialty prices are saved
   const specialtyIds = ['p-duct-sealing','p-no-burn','p-cert-fee','p-street-cleaning'];
-  if (specialtyIds.some(id => parseFloat(d.prices?.[id]||0) > 0)) {
+  if (specialtyIds.some(id => id === 'p-cert-fee' ? String(d.prices?.[id]||'').trim() !== '' : parseFloat(d.prices?.[id]||0) > 0)) {
     const panel = document.getElementById('specialty-panel');
     const icon  = document.getElementById('specialty-toggle-icon');
     if (panel) { panel.style.display='block'; icon.style.transform='rotate(180deg)'; }
@@ -1604,8 +1606,17 @@ function generateProposal(previewOnly) {
     addlRows += `<div class="prop-addl-row"><span>Duct Sealing</span><span class="prop-addl-price">${fmtP(val('p-duct-sealing'))}</span></div>`;
   if (val('p-no-burn') > 0)
     addlRows += `<div class="prop-addl-row"><span>No Burn</span><span class="prop-addl-price">${fmtP(val('p-no-burn'))}</span></div>`;
-  if (val('p-cert-fee') > 0)
-    addlRows += `<div class="prop-addl-row"><span>Certification Fee</span><span class="prop-addl-price">${fmtP(val('p-cert-fee'))}</span></div>`;
+  {
+    const certRaw = String(d.prices['p-cert-fee']||'').trim();
+    if (certRaw) {
+      const certPlain = /^\$?\s*[\d,]*\.?\d+$/.test(certRaw);
+      const certNum = parseFloat(certRaw.replace(/[$,\s]/g,''))||0;
+      let certDisp;
+      if (certPlain) certDisp = certNum > 0 ? fmtP(certNum) : '';
+      else { const t = certRaw.replace(/^\$\s*/,''); certDisp = htmlAttr(/^\d/.test(t) ? '$'+t : t); }
+      if (certDisp) addlRows += `<div class="prop-addl-row"><span>Certification Fee</span><span class="prop-addl-price">${certDisp}</span></div>`;
+    }
+  }
   if (val('p-street-cleaning') > 0)
     addlRows += `<div class="prop-addl-row"><span>Street Cleaning</span><span class="prop-addl-price">${fmtP(val('p-street-cleaning'))}</span></div>`;
   d.otherRows.forEach(r => {
